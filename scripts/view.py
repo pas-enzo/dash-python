@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt, QTimer
 import pyqtgraph as pg
+#aaaaaaaaaaaaaaaaaaaaaaaaaa
 
 class RacingDashboard(QMainWindow):
     def __init__(self):
