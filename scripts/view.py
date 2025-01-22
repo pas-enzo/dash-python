@@ -4,6 +4,7 @@ from PyQt5.QtGui import QPixmap, QFont, QIcon
 from PyQt5.QtWidgets import QAction
 from PyQt5.QtCore import Qt, QTimer
 import pyqtgraph as pg
+# pinto pinto pinto
 
 class RacingDashboard(QMainWindow):
     def __init__(self):
