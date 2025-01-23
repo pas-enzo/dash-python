@@ -2,11 +2,10 @@ import sys
 import numpy as np
 from PyQt5.QtGui import QPixmap, QFont, QIcon
 from PyQt5.QtWidgets import (
-    QAction, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QToolBar, QApplication
+    QAction, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QToolBar, QApplication, QSizePolicy
 )
 from PyQt5.QtCore import Qt, QTimer
 import pyqtgraph as pg
-#aaaaaaaaaaaaaaaaaaaaaaaaaa
 
 class RacingDashboard(QMainWindow):
     def __init__(self):
@@ -21,47 +20,49 @@ class RacingDashboard(QMainWindow):
         self.layout = QGridLayout(self.main_widget)
         self.main_widget.setLayout(self.layout)
 
+        self.load_stylesheet("styles.qss")
         self.initUI()
 
-    def initUI(self):
-        self.setStyleSheet("background-color: #2B2B2B; color: white;")
+    def load_stylesheet(self, path):
+        """Carrega a folha de estilo externa."""
+        try:
+            with open(path, "r") as file:
+                self.setStyleSheet(file.read())
+        except FileNotFoundError:
+            print(f"Erro: O arquivo de estilo '{path}' não foi encontrado.")
 
+    def initUI(self):
         # Add a toolbar
         toolbar = QToolBar("Main Toolbar", self)
-        self.addToolBar(toolbar)
-        toolbar.setStyleSheet("background-color: #2B2B2B; color: white;")
+        self.addToolBar(Qt.TopToolBarArea, toolbar)
+        toolbar.setMovable(False)
+        toolbar.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
-        # Add actions to the toolbar
-        general_action = QAction(QIcon(), "Geral", self)
-        RPM_action = QAction(QIcon(), "RPM", self)
-        speed_action = QAction(QIcon(), "Velocidade", self)
-        angle_action = QAction(QIcon(), "Ângulo", self)
-        lat_gforce_action = QAction(QIcon(), "G-Lateral", self)
-        long_gforce_action = QAction(QIcon(), "G-Longitudinal", self)
-        temp_action = QAction(QIcon(), "Temperatura CVT", self)
+        # Add actions to the toolbar with spacers
+        actions = [
+            QAction(QIcon(), "Geral", self),
+            QAction(QIcon(), "Gráficos", self),
+            QAction(QIcon(), "Mapa", self),
+        ]
 
-        toolbar.addAction(general_action)
-        toolbar.addAction(RPM_action)
-        toolbar.addAction(speed_action)
-        toolbar.addAction(angle_action)
-        toolbar.addAction(lat_gforce_action)
-        toolbar.addAction(long_gforce_action)
-        toolbar.addAction(temp_action)
+        for action in actions:
+            spacer = QWidget()
+            spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+            toolbar.addWidget(spacer)  # Add spacer
+            toolbar.addAction(action)
 
-        toolbar_layout = QHBoxLayout()
-        toolbar_widget = QWidget()
-        toolbar_widget.setLayout(toolbar_layout)
-        toolbar_layout.addWidget(toolbar)
-        toolbar_layout.setAlignment(Qt.AlignCenter)
+        # Add a final spacer to balance the toolbar
+        spacer = QWidget()
+        spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        toolbar.addWidget(spacer)
 
-        self.layout.addWidget(toolbar_widget, 0, 0, 1, 4)
-
+        # Layout for central widgets
         central_layout = QVBoxLayout()
         self.dynamic_graphs_widget = pg.GraphicsLayoutWidget(show=True)
         self.dynamic_graphs_widget.setBackground('#2B2B2B')
         central_layout.addWidget(self.dynamic_graphs_widget)
 
-        self.layout.addLayout(central_layout, 1, 1, 1, 2)
+        self.layout.addLayout(central_layout, 1, 0, 1, 4)  # Adjusted grid layout
         self.plot_dynamic_graphs()
 
     def plot_dynamic_graphs(self):
