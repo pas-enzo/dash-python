@@ -1,12 +1,14 @@
 import sys
 import numpy as np
 import os
-from PyQt5.QtGui import QPixmap, QFont, QIcon
+from PyQt5.QtGui import QPixmap, QFont, QIcon, QFontDatabase
 from PyQt5.QtWidgets import (
     QAction, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QToolBar, QApplication, QSizePolicy, QToolButton
 )
 from PyQt5.QtCore import Qt, QTimer
 import pyqtgraph as pg
+from velocimetro import VelocimetroWidget
+from combustivel import BarraCombustivelWidget
 
 class RacingDashboard(QMainWindow):
     def __init__(self):
@@ -20,6 +22,8 @@ class RacingDashboard(QMainWindow):
 
         self.layout = QGridLayout(self.main_widget)
         self.main_widget.setLayout(self.layout)
+        
+        self.load_fonts()
 
         # Carregar a folha de estilo
         self.load_stylesheet("styles.qss")
@@ -36,6 +40,18 @@ class RacingDashboard(QMainWindow):
                 self.setStyleSheet(file.read())
         except FileNotFoundError:
             print(f"Erro: O arquivo de estilo '{path}' não foi encontrado.")
+            
+    def load_fonts(self):
+        """Carrega fontes personalizadas da pasta local."""
+        font_files = ["High Speed.ttf", "High Speed.otf"]  # Substitua pelos nomes das suas fontes
+        for font_file in font_files:
+            font_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), font_file)
+            font_id = QFontDatabase.addApplicationFont(font_path)
+            if font_id == -1:
+                print(f"Erro ao carregar a fonte: {font_file}")
+            else:
+                families = QFontDatabase.applicationFontFamilies(font_id)
+                print(f"Fonte carregada: {font_file} | Famílias disponíveis: {families}")
 
     def initUI(self):
         # Add a toolbar
@@ -47,6 +63,7 @@ class RacingDashboard(QMainWindow):
         # Add actions to the toolbar with spacers
         actions = [
             QAction(QIcon(), "Geral", self),
+            QAction(QIcon(), "Pneus", self),
             QAction(QIcon(), "Gráficos", self),
             QAction(QIcon(), "Mapa", self),
         ]
@@ -57,15 +74,24 @@ class RacingDashboard(QMainWindow):
             button.setIcon(action.icon())
             button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)  # Expanding to fill space
             toolbar.addWidget(button)
+        
+        # Adicionando widgets específicos ao layout
+        self.add_widgets()
+        # self.plot_dynamic_graphs()
 
-        # Layout for central widgets
-        central_layout = QVBoxLayout()
+    def add_widgets(self):
+        # Adicionando o velocímetro
+        self.velocimetro = VelocimetroWidget()
+        self.layout.addWidget(self.velocimetro, 0, 0, 2, 1)  # Ocupa 2 linhas e 1 coluna
+
+        # Adicionando a barra de combustível
+        self.barra_combustivel = BarraCombustivelWidget()
+        self.layout.addWidget(self.barra_combustivel, 0, 3, 2, 1)  # Ocupa 2 linhas e 1 coluna
+
+        # Layout para gráficos dinâmicos
         self.dynamic_graphs_widget = pg.GraphicsLayoutWidget(show=True)
         self.dynamic_graphs_widget.setBackground('#2B2B2B')
-        central_layout.addWidget(self.dynamic_graphs_widget)
-
-        self.layout.addLayout(central_layout, 1, 0, 1, 4)  # Adjusted grid layout
-        self.plot_dynamic_graphs()
+        self.layout.addWidget(self.dynamic_graphs_widget, 2, 0, 4, 4)  # Ocupa 4 linhas e 4 colunas
 
     def plot_dynamic_graphs(self):
         # Example graphs for different metrics

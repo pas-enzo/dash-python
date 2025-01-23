@@ -14,13 +14,14 @@ QToolBar {
 
 /* Estilo para os botões da barra de ferramentas */
 QToolButton {
-    color: white;
+    color: #DFAE21;
     background-color: #444444;
     border: 1px solid #555555;
-    border-radius: 5px;
+    border-radius: 20px;
     padding: 10px;  /* Aumenta o padding para aumentar o tamanho do botão */
     font-size: 20px;
     width: 100%;  /* Faz com que o botão ocupe o espaço disponível */
+    font-family: "High Speed";
 }
 
 QToolButton:hover {
