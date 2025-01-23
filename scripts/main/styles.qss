@@ -1,0 +1,32 @@
+/* Estilo para a janela principal */
+QMainWindow {
+    background-color: #2B2B2B;
+    color: white;
+}
+
+/* Estilo para a barra de ferramentas */
+QToolBar {
+    background-color: #333333;
+    border: 1px solid #444444;
+    spacing: 10px;  /* Espaçamento entre ações */
+    min-height: 70px;  /* Aumenta a altura da barra de ferramentas */
+}
+
+/* Estilo para os botões da barra de ferramentas */
+QToolButton {
+    color: white;
+    background-color: #444444;
+    border: 1px solid #555555;
+    border-radius: 5px;
+    padding: 10px;  /* Aumenta o padding para aumentar o tamanho do botão */
+    font-size: 20px;
+    width: 100%;  /* Faz com que o botão ocupe o espaço disponível */
+}
+
+QToolButton:hover {
+    background-color: #555555;
+}
+
+QToolButton:pressed {
+    background-color: #666666;
+}

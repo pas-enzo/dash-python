@@ -1,8 +1,9 @@
 import sys
 import numpy as np
+import os
 from PyQt5.QtGui import QPixmap, QFont, QIcon
 from PyQt5.QtWidgets import (
-    QAction, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QToolBar, QApplication, QSizePolicy
+    QAction, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QToolBar, QApplication, QSizePolicy, QToolButton
 )
 from PyQt5.QtCore import Qt, QTimer
 import pyqtgraph as pg
@@ -20,13 +21,18 @@ class RacingDashboard(QMainWindow):
         self.layout = QGridLayout(self.main_widget)
         self.main_widget.setLayout(self.layout)
 
+        # Carregar a folha de estilo
         self.load_stylesheet("styles.qss")
         self.initUI()
 
     def load_stylesheet(self, path):
         """Carrega a folha de estilo externa."""
         try:
-            with open(path, "r") as file:
+            # Obtém o diretório atual do script e cria o caminho absoluto para o arquivo .qss
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            full_path = os.path.join(script_dir, path)
+
+            with open(full_path, "r") as file:
                 self.setStyleSheet(file.read())
         except FileNotFoundError:
             print(f"Erro: O arquivo de estilo '{path}' não foi encontrado.")
@@ -46,15 +52,11 @@ class RacingDashboard(QMainWindow):
         ]
 
         for action in actions:
-            spacer = QWidget()
-            spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-            toolbar.addWidget(spacer)  # Add spacer
-            toolbar.addAction(action)
-
-        # Add a final spacer to balance the toolbar
-        spacer = QWidget()
-        spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-        toolbar.addWidget(spacer)
+            button = QToolButton(self)
+            button.setText(action.text())
+            button.setIcon(action.icon())
+            button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)  # Expanding to fill space
+            toolbar.addWidget(button)
 
         # Layout for central widgets
         central_layout = QVBoxLayout()
