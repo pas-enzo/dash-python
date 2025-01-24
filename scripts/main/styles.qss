@@ -15,9 +15,9 @@ QToolBar {
 /* Estilo para os botões da barra de ferramentas */
 QToolButton {
     color: #DFAE21;
-    background-color: #444444;
+    background-color: #333333;
     border: 1px solid #555555;
-    border-radius: 20px;
+    border-radius: 0px;
     padding: 10px;  /* Aumenta o padding para aumentar o tamanho do botão */
     font-size: 20px;
     width: 100%;  /* Faz com que o botão ocupe o espaço disponível */
@@ -30,4 +30,15 @@ QToolButton:hover {
 
 QToolButton:pressed {
     background-color: #666666;
+}
+
+QToolButton:checked {
+    background-color: #3A3A3A;  /* Cor de fundo quando o botão está selecionado */
+    color: white;  /* Cor do texto quando o botão está selecionado */
+    border: 2px solid #FF6347;  /* Cor da borda quando o botão está selecionado */
+}
+
+QToolButton:checked:hover {
+    background-color: #FF6347;  /* Cor de fundo quando o botão está selecionado e o mouse passa por cima */
+    color: white;  /* Cor do texto quando o botão está selecionado e o mouse passa por cima */
 }

@@ -3,7 +3,7 @@ import numpy as np
 import os
 from PyQt5.QtGui import QPixmap, QFont, QIcon, QFontDatabase
 from PyQt5.QtWidgets import (
-    QAction, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QToolBar, QApplication, QSizePolicy, QToolButton
+    QAction, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QToolBar, QApplication, QSizePolicy, QToolButton, QLabel
 )
 from PyQt5.QtCore import Qt, QTimer
 import pyqtgraph as pg
@@ -74,11 +74,69 @@ class RacingDashboard(QMainWindow):
             button.setIcon(action.icon())
             button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)  # Expanding to fill space
             toolbar.addWidget(button)
-        
+            # Conectar o evento de clique
+            button.clicked.connect(self.on_button_click)
+
         # Adicionando widgets específicos ao layout
         self.add_widgets()
-        # self.plot_dynamic_graphs()
+        self.plot_dynamic_graphs()
 
+    def on_button_click(self):
+        """Método chamado quando um botão da toolbar é clicado."""
+        button = self.sender()  # Obtém o botão que foi clicado
+        button_name = button.text()
+        # print(f"Botão '{button_name}' foi clicado!")
+
+        # Aqui você pode adicionar lógica para o que deve acontecer
+        # quando cada botão for clicado, como mudar o conteúdo da interface, etc.
+        if button_name == "Geral":
+            self.show_general_info()
+        elif button_name == "Pneus":
+            self.show_tires_info()
+        elif button_name == "Gráficos":
+            self.show_graphs()
+        elif button_name == "Mapa":
+            self.show_map()
+            
+    def clear_screen(self):
+        """Limpa todos os widgets do layout principal, mas não a QToolBar."""
+        for i in reversed(range(self.layout.count())):
+            widget_item = self.layout.itemAt(i)
+            if widget_item.widget() is not None:
+                widget_item.widget().deleteLater()
+
+    def show_general_info(self):
+        self.clear_screen()
+        print("Exibindo informações gerais...")
+        
+        # Exemplo de como adicionar um novo widget (por exemplo, um QLabel)
+        general_info_label = QLabel("Informações gerais do sistema")
+        self.layout.addWidget(general_info_label, 0, 0)
+
+    def show_tires_info(self):
+        self.clear_screen()
+        print("Exibindo informações sobre pneus...")
+        
+        # Exemplo de como adicionar um novo widget (por exemplo, um gráfico ou outro componente)
+        tires_info_label = QLabel("Informações sobre pneus")
+        self.layout.addWidget(tires_info_label, 0, 0)
+
+    def show_graphs(self):
+        self.clear_screen()
+        print("Exibindo gráficos...")
+        
+        # Exemplo de como adicionar um gráfico
+        self.plot_dynamic_graphs()
+
+    def show_map(self):
+        self.clear_screen()
+        print("Exibindo mapa...")
+        
+        # Exemplo de como adicionar um mapa (ou outro widget)
+        map_widget = QLabel("Mapa do circuito")
+        self.layout.addWidget(map_widget, 0, 0)
+
+        
     def add_widgets(self):
         # Adicionando o velocímetro
         self.velocimetro = VelocimetroWidget()
