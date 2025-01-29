@@ -3,7 +3,8 @@ import numpy as np
 import os
 from PyQt5.QtGui import QPixmap, QFont, QIcon, QFontDatabase
 from PyQt5.QtWidgets import (
-    QAction, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QToolBar, QApplication, QSizePolicy, QToolButton, QLabel
+    QAction, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QToolBar, QApplication, QSizePolicy, 
+    QToolButton, QLabel
 )
 from PyQt5.QtCore import Qt, QTimer
 import pyqtgraph as pg
@@ -24,15 +25,11 @@ class RacingDashboard(QMainWindow):
         self.main_widget.setLayout(self.layout)
         
         self.load_fonts()
-
-        # Carregar a folha de estilo
         self.load_stylesheet("styles.qss")
         self.initUI()
 
     def load_stylesheet(self, path):
-        """Carrega a folha de estilo externa."""
         try:
-            # Obtém o diretório atual do script e cria o caminho absoluto para o arquivo .qss
             script_dir = os.path.dirname(os.path.abspath(__file__))
             full_path = os.path.join(script_dir, path)
 
@@ -42,8 +39,7 @@ class RacingDashboard(QMainWindow):
             print(f"Erro: O arquivo de estilo '{path}' não foi encontrado.")
             
     def load_fonts(self):
-        """Carrega fontes personalizadas da pasta local."""
-        font_files = ["High Speed.ttf", "High Speed.otf"]  # Substitua pelos nomes das suas fontes
+        font_files = ["High Speed.ttf", "High Speed.otf"]
         for font_file in font_files:
             font_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), font_file)
             font_id = QFontDatabase.addApplicationFont(font_path)
@@ -54,13 +50,11 @@ class RacingDashboard(QMainWindow):
                 print(f"Fonte carregada: {font_file} | Famílias disponíveis: {families}")
 
     def initUI(self):
-        # Add a toolbar
         toolbar = QToolBar("Main Toolbar", self)
         self.addToolBar(Qt.TopToolBarArea, toolbar)
         toolbar.setMovable(False)
         toolbar.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
-        # Add actions to the toolbar with spacers
         actions = [
             QAction(QIcon(), "Geral", self),
             QAction(QIcon(), "Pneus", self),
@@ -72,23 +66,14 @@ class RacingDashboard(QMainWindow):
             button = QToolButton(self)
             button.setText(action.text())
             button.setIcon(action.icon())
-            button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)  # Expanding to fill space
+            button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
             toolbar.addWidget(button)
-            # Conectar o evento de clique
             button.clicked.connect(self.on_button_click)
 
-        # Adicionando widgets específicos ao layout
-        self.add_widgets()
-        self.plot_dynamic_graphs()
-
     def on_button_click(self):
-        """Método chamado quando um botão da toolbar é clicado."""
-        button = self.sender()  # Obtém o botão que foi clicado
+        button = self.sender()
         button_name = button.text()
-        # print(f"Botão '{button_name}' foi clicado!")
 
-        # Aqui você pode adicionar lógica para o que deve acontecer
-        # quando cada botão for clicado, como mudar o conteúdo da interface, etc.
         if button_name == "Geral":
             self.show_general_info()
         elif button_name == "Pneus":
@@ -99,7 +84,6 @@ class RacingDashboard(QMainWindow):
             self.show_map()
             
     def clear_screen(self):
-        """Limpa todos os widgets do layout principal, mas não a QToolBar."""
         for i in reversed(range(self.layout.count())):
             widget_item = self.layout.itemAt(i)
             if widget_item.widget() is not None:
@@ -108,51 +92,78 @@ class RacingDashboard(QMainWindow):
     def show_general_info(self):
         self.clear_screen()
         print("Exibindo informações gerais...")
-        
-        # Exemplo de como adicionar um novo widget (por exemplo, um QLabel)
-        general_info_label = QLabel("Informações gerais do sistema")
-        self.layout.addWidget(general_info_label, 0, 0)
+
+        # Criar um layout de grade 3x3
+        self.layout = QGridLayout()
+        self.layout.setSpacing(5)  # Define um espaçamento entre os quadrantes
+
+        # Criar os quadrantes (widgets vazios)
+        quadrantes = [[QWidget() for _ in range(3)] for _ in range(3)]
+
+        # Adiciona uma classe personalizada para os quadrantes
+        for i in range(3):
+            for j in range(3):
+                quadrantes[i][j].setObjectName(f"quadrante_{i}_{j}")
+                self.layout.addWidget(quadrantes[i][j], i, j)
+
+        # Garantir que todos os quadrantes tenham o mesmo tamanho
+        for i in range(3):
+            self.layout.setRowStretch(i, 1)
+            self.layout.setColumnStretch(i, 1)
+
+        # Criar widgets e adicioná-los nos quadrantes corretos
+        # velocimetro = VelocimetroWidget()
+        # barra_combustivel = BarraCombustivelWidget()
+        label_info = QLabel("")
+
+        label_info.setAlignment(Qt.AlignCenter)
+        label_info.setStyleSheet("font-size: 18px; color: white;")
+
+        # Criar layouts internos para centralizar os widgets
+        layout_velocimetro = QVBoxLayout()
+        # layout_velocimetro.addWidget(velocimetro)
+        layout_velocimetro.setAlignment(Qt.AlignCenter)
+        quadrantes[0][1].setLayout(layout_velocimetro)
+
+        layout_combustivel = QVBoxLayout()
+        # layout_combustivel.addWidget(barra_combustivel)
+        layout_combustivel.setAlignment(Qt.AlignCenter)
+        quadrantes[2][1].setLayout(layout_combustivel)
+
+        layout_info = QVBoxLayout()
+        layout_info.addWidget(label_info)
+        layout_info.setAlignment(Qt.AlignCenter)
+        quadrantes[1][1].setLayout(layout_info)
+
+        # Aplicar o layout corrigido na tela
+        central_widget = QWidget()
+        central_widget.setLayout(self.layout)
+        self.setCentralWidget(central_widget)
 
     def show_tires_info(self):
         self.clear_screen()
         print("Exibindo informações sobre pneus...")
-        
-        # Exemplo de como adicionar um novo widget (por exemplo, um gráfico ou outro componente)
         tires_info_label = QLabel("Informações sobre pneus")
         self.layout.addWidget(tires_info_label, 0, 0)
 
     def show_graphs(self):
         self.clear_screen()
+        graph_label = QLabel("Gráficos")
+        self.layout.addWidget(graph_label, 0, 0)
         print("Exibindo gráficos...")
-        
-        # Exemplo de como adicionar um gráfico
         self.plot_dynamic_graphs()
 
     def show_map(self):
         self.clear_screen()
         print("Exibindo mapa...")
-        
-        # Exemplo de como adicionar um mapa (ou outro widget)
         map_widget = QLabel("Mapa do circuito")
         self.layout.addWidget(map_widget, 0, 0)
 
-        
-    def add_widgets(self):
-        # Adicionando o velocímetro
-        self.velocimetro = VelocimetroWidget()
-        self.layout.addWidget(self.velocimetro, 0, 0, 2, 1)  # Ocupa 2 linhas e 1 coluna
-
-        # Adicionando a barra de combustível
-        self.barra_combustivel = BarraCombustivelWidget()
-        self.layout.addWidget(self.barra_combustivel, 0, 3, 2, 1)  # Ocupa 2 linhas e 1 coluna
-
-        # Layout para gráficos dinâmicos
+    def plot_dynamic_graphs(self):
         self.dynamic_graphs_widget = pg.GraphicsLayoutWidget(show=True)
         self.dynamic_graphs_widget.setBackground('#2B2B2B')
-        self.layout.addWidget(self.dynamic_graphs_widget, 2, 0, 4, 4)  # Ocupa 4 linhas e 4 colunas
+        self.layout.addWidget(self.dynamic_graphs_widget, 0, 0, 3, 3)
 
-    def plot_dynamic_graphs(self):
-        # Example graphs for different metrics
         self.gforce_plot = self.dynamic_graphs_widget.addPlot(title="Força G (Longitudinal)")
         self.gforce_plot.setLabel('left', 'Força G (g)')
         self.gforce_plot.setLabel('bottom', 'Tempo (s)')
@@ -180,7 +191,6 @@ class RacingDashboard(QMainWindow):
         self.timer.start(1000)
 
     def update_dynamic_graphs(self):
-        # Simulated dynamic data
         t = np.linspace(0, 10, 1000)
         gforce = np.sin(t) + np.random.normal(size=1000) * 0.1
         speed = np.abs(np.sin(t / 2)) * 30 + np.random.normal(size=1000) * 5

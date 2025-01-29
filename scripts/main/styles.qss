@@ -42,3 +42,12 @@ QToolButton:checked:hover {
     background-color: #FF6347;  /* Cor de fundo quando o botão está selecionado e o mouse passa por cima */
     color: white;  /* Cor do texto quando o botão está selecionado e o mouse passa por cima */
 }
+
+/* Estilo para os quadrantes */
+QWidget#quadrante_0_0, QWidget#quadrante_0_1, QWidget#quadrante_0_2,
+QWidget#quadrante_1_0, QWidget#quadrante_1_1, QWidget#quadrante_1_2,
+QWidget#quadrante_2_0, QWidget#quadrante_2_1, QWidget#quadrante_2_2 {
+    border: none;
+    background-color: rgba(255, 255, 255, 0.1); /* Fundo semitransparente */
+    border-radius: 20px;
+}
