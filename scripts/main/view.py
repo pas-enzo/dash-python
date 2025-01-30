@@ -10,6 +10,7 @@ from PyQt5.QtCore import Qt, QTimer
 import pyqtgraph as pg
 from velocimetro import VelocimetroWidget
 from combustivel import BarraCombustivelWidget
+from botaobox import CallCarWidget
 
 class RacingDashboard(QMainWindow):
     def __init__(self):
@@ -57,7 +58,7 @@ class RacingDashboard(QMainWindow):
 
         actions = [
             QAction(QIcon(), "Geral", self),
-            QAction(QIcon(), "Pneus", self),
+            QAction(QIcon(), "Carro", self),
             QAction(QIcon(), "Gráficos", self),
             QAction(QIcon(), "Mapa", self),
         ]
@@ -114,6 +115,7 @@ class RacingDashboard(QMainWindow):
         # Criar widgets e adicioná-los nos quadrantes corretos
         # velocimetro = VelocimetroWidget()
         # barra_combustivel = BarraCombustivelWidget()
+        # botaobox = CallCarWidget()
         label_info = QLabel("")
 
         label_info.setAlignment(Qt.AlignCenter)
@@ -129,6 +131,11 @@ class RacingDashboard(QMainWindow):
         # layout_combustivel.addWidget(barra_combustivel)
         layout_combustivel.setAlignment(Qt.AlignCenter)
         quadrantes[2][1].setLayout(layout_combustivel)
+
+        layout_botaobox = QVBoxLayout()
+        # layout_botaobox.addWidget(botaobox)
+        layout_botaobox.setAlignment(Qt.AlignCenter)
+        quadrantes[1][2].setLayout(layout_botaobox)
 
         layout_info = QVBoxLayout()
         layout_info.addWidget(label_info)
