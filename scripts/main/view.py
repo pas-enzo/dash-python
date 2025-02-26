@@ -3,7 +3,7 @@ import numpy as np
 import os
 from PyQt5.QtGui import QPixmap, QFont, QIcon, QFontDatabase
 from PyQt5.QtWidgets import (
-    QAction, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QToolBar, QApplication, QSizePolicy, 
+    QAction, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QToolBar, QApplication, QSizePolicy,
     QToolButton, QLabel, QStackedWidget
 )
 from PyQt5.QtCore import Qt, QTimer
@@ -15,6 +15,17 @@ from velocimetro import VelocimetroWidget
 from combustivel import BarraCombustivelWidget
 from botaobox import CallCarWidget
 from tacometro import TacometroWidget
+from acionamento import FourWheelDriveWidget
+import logging
+import configparser
+
+# Configuração de logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Carregar configurações
+config = configparser.ConfigParser()
+config.read('config.ini')
 
 class RacingDashboard(QMainWindow):
     def __init__(self):
@@ -68,7 +79,8 @@ class RacingDashboard(QMainWindow):
         barra_combustivel = BarraCombustivelWidget()
         botaobox = CallCarWidget()
         label_info = QLabel("")
-        tacometro = TacometroWidget()  # Adiciona o tacômetro
+        tacometro = TacometroWidget()
+        four_wheel_drive = FourWheelDriveWidget()  # Adiciona a widget do 4x4
 
         label_info.setAlignment(Qt.AlignCenter)
         label_info.setStyleSheet("font-size: 18px; color: white;")
@@ -100,14 +112,21 @@ class RacingDashboard(QMainWindow):
         layout_tacometro.setAlignment(Qt.AlignCenter)
         quadrantes[0][0].setLayout(layout_tacometro)
 
+        # Adicionar a widget do 4x4 no canto superior direito (quadrante [2][2])
+        layout_four_wheel_drive = QVBoxLayout()
+        layout_four_wheel_drive.addWidget(four_wheel_drive)
+        layout_four_wheel_drive.setAlignment(Qt.AlignCenter)
+        quadrantes[2][2].setLayout(layout_four_wheel_drive)
+
         return widget
 
     def create_car_widget(self):
         widget = QWidget()
         layout = QVBoxLayout(widget)
-        tires_info_label = QLabel("Informações sobre pneus")
-        tires_info_label.setStyleSheet("font-size: 18px; color: white;")
-        layout.addWidget(tires_info_label)
+        # Removendo a label "Informações sobre pneus"
+        # tires_info_label = QLabel("Informações sobre pneus")
+        # tires_info_label.setStyleSheet("font-size: 18px; color: white;")
+        # layout.addWidget(tires_info_label)
         return widget
 
     def create_graphs_widget(self):
@@ -146,14 +165,17 @@ class RacingDashboard(QMainWindow):
         return widget
 
     def update_dynamic_graphs(self):
-        t = np.linspace(0, 10, 1000)
-        gforce = np.sin(t) + np.random.normal(size=1000) * 0.1
-        speed = np.abs(np.sin(t / 2)) * 30 + np.random.normal(size=1000) * 5
-        braking = np.abs(25 * np.log(t * 19)) + np.random.normal(size=1000) * 0.2
+        try:
+            t = np.linspace(0, 10, 1000)
+            gforce = np.sin(t) + np.random.normal(size=1000) * 0.1
+            speed = np.abs(np.sin(t / 2)) * 30 + np.random.normal(size=1000) * 5
+            braking = np.abs(25 * np.log(t * 19)) + np.random.normal(size=1000) * 0.2
 
-        self.gforce_curve.setData(t, gforce)
-        self.speed_curve.setData(t, speed)
-        self.braking_curve.setData(t, braking)
+            self.gforce_curve.setData(t, gforce)
+            self.speed_curve.setData(t, speed)
+            self.braking_curve.setData(t, braking)
+        except Exception as e:
+            logger.error(f"Erro ao atualizar gráficos: {e}")
 
     def load_stylesheet(self, path):
         try:
@@ -163,18 +185,23 @@ class RacingDashboard(QMainWindow):
             with open(full_path, "r") as file:
                 self.setStyleSheet(file.read())
         except FileNotFoundError:
-            print(f"Erro: O arquivo de estilo '{path}' não foi encontrado.")
+            logger.error(f"Erro: O arquivo de estilo '{path}' não foi encontrado.")
+        except Exception as e:
+            logger.error(f"Erro ao carregar o arquivo de estilo: {e}")
 
     def load_fonts(self):
         font_files = ["High Speed.ttf", "High Speed.otf"]
         for font_file in font_files:
-            font_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), font_file)
-            font_id = QFontDatabase.addApplicationFont(font_path)
-            if font_id == -1:
-                print(f"Erro ao carregar a fonte: {font_file}")
-            else:
-                families = QFontDatabase.applicationFontFamilies(font_id)
-                print(f"Fonte carregada: {font_file} | Famílias disponíveis: {families}")
+            try:
+                font_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), font_file)
+                font_id = QFontDatabase.addApplicationFont(font_path)
+                if font_id == -1:
+                    logger.error(f"Erro ao carregar a fonte: {font_file}")
+                else:
+                    families = QFontDatabase.applicationFontFamilies(font_id)
+                    logger.info(f"Fonte carregada: {font_file} | Famílias disponíveis: {families}")
+            except Exception as e:
+                logger.error(f"Erro ao carregar a fonte {font_file}: {e}")
 
     def initUI(self):
         toolbar = QToolBar("Main Toolbar", self)
