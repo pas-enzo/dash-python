@@ -7,6 +7,9 @@ from PyQt5.QtWidgets import (
     QToolButton, QLabel
 )
 from PyQt5.QtCore import Qt, QTimer
+import time
+import random
+from map_view import MapWidget
 import pyqtgraph as pg
 from velocimetro import VelocimetroWidget
 from combustivel import BarraCombustivelWidget
@@ -113,9 +116,9 @@ class RacingDashboard(QMainWindow):
             self.layout.setColumnStretch(i, 1)
 
         # Criar widgets e adicioná-los nos quadrantes corretos
-        # velocimetro = VelocimetroWidget()
-        # barra_combustivel = BarraCombustivelWidget()
-        # botaobox = CallCarWidget()
+        velocimetro = VelocimetroWidget()
+        barra_combustivel = BarraCombustivelWidget()
+        botaobox = CallCarWidget()
         label_info = QLabel("")
 
         label_info.setAlignment(Qt.AlignCenter)
@@ -123,17 +126,17 @@ class RacingDashboard(QMainWindow):
 
         # Criar layouts internos para centralizar os widgets
         layout_velocimetro = QVBoxLayout()
-        # layout_velocimetro.addWidget(velocimetro)
+        layout_velocimetro.addWidget(velocimetro)
         layout_velocimetro.setAlignment(Qt.AlignCenter)
         quadrantes[0][1].setLayout(layout_velocimetro)
 
         layout_combustivel = QVBoxLayout()
-        # layout_combustivel.addWidget(barra_combustivel)
+        layout_combustivel.addWidget(barra_combustivel)
         layout_combustivel.setAlignment(Qt.AlignCenter)
         quadrantes[2][1].setLayout(layout_combustivel)
 
         layout_botaobox = QVBoxLayout()
-        # layout_botaobox.addWidget(botaobox)
+        layout_botaobox.addWidget(botaobox)
         layout_botaobox.setAlignment(Qt.AlignCenter)
         quadrantes[1][2].setLayout(layout_botaobox)
 
@@ -162,10 +165,11 @@ class RacingDashboard(QMainWindow):
 
     def show_map(self):
         self.clear_screen()
-        print("Exibindo mapa...")
-        map_widget = QLabel("Mapa do circuito")
-        self.layout.addWidget(map_widget, 0, 0)
+        self.map_widget = MapWidget(self)
+        self.map_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.layout.addWidget(self.map_widget, 0, 0, 1, 1)
 
+def main():
     def plot_dynamic_graphs(self):
         self.dynamic_graphs_widget = pg.GraphicsLayoutWidget(show=True)
         self.dynamic_graphs_widget.setBackground('#2B2B2B')
