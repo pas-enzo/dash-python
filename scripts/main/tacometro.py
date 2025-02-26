@@ -1,94 +1,103 @@
 from PyQt5.QtCore import QTimer, Qt, QPropertyAnimation, pyqtProperty, QEasingCurve
 from PyQt5.QtGui import QPainter, QColor, QFont
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QWidget, QSizePolicy
 import math
 
 class TacometroWidget(QWidget):
-    def __init__(self):
-        super().__init__()
-
-        self._valor_atual = 0  # Valor inicial
-        self.direcao = 1  # Direção: 1 para subir, -1 para descer
-
-        # Timer para atualizar o tacômetro
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._valor_atual = 0
+        self.direcao = 1
+        
+        # Configurações de tamanho
+        self.setMinimumSize(200, 200)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        
+        # Timer e animação
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_tacometro)
-        self.timer.start(100)  # Atualizações a cada 100 ms
-
-        # Animação para o ponteiro
+        self.timer.start(50)
+        
         self.animation = QPropertyAnimation(self, b"valor_atual")
-        self.animation.setDuration(500)  # Duração da animação
-        self.animation.setEasingCurve(QEasingCurve.InOutQuad)  # Curva de suavização
+        self.animation.setDuration(1000)
+        self.animation.setEasingCurve(QEasingCurve.InOutQuad)
 
     def update_tacometro(self):
-        # Simulação do tacômetro indo de 0 a 3600 e depois voltando de 3600 a 0
         if self._valor_atual >= 3600:
             self.direcao = -1
         elif self._valor_atual <= 0:
             self.direcao = 1
-
-        nova_velocidade = self._valor_atual + self.direcao * 10  # Ajustando a velocidade de variação
-        self.setVelocidade(nova_velocidade)
-
-    def setVelocidade(self, valor):
-        self._valor_atual = valor
-        self.update()  # Força a atualização
+        self.setValorAtual(self._valor_atual + self.direcao * 50)
 
     def paintEvent(self, event):
-        # Criação do objeto QPainter para desenhar o tacômetro
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.Antialiasing)
+        with QPainter(self) as painter:  # Context manager para gerenciar o painter
+            painter.setRenderHint(QPainter.Antialiasing)
+            
+            # Obter dimensões corretas
+            width = self.width()
+            height = self.height()
+            
+            # Centralizar verticalmente
+            center_x = width // 2
+            center_y = height // 2  # Correção crucial aqui
+            
+            # Calcular raio proporcional
+            radius = min(width, height) // 2 - 20
+            
+            # Desenhar fundo do semicírculo
+            painter.setBrush(QColor(30, 30, 30, 200))
+            painter.setPen(Qt.NoPen)
+            painter.drawPie(
+                center_x - radius,
+                center_y - radius,
+                radius * 2,
+                radius * 2,
+                180 * 16,
+                -180 * 16
+            )
 
-        # Calcula dinamicamente o centro e o raio
-        center_x = self.width() // 2
-        center_y = self.height() // 2  # Ajuste para alinhar o meio-círculo na parte superior
-        radius = min(self.width(), self.height() * 2) // 3  # Proporção ajustada
-
-        # Desenhando o fundo transparente
-        painter.setBrush(Qt.NoBrush)
-        painter.setPen(Qt.NoPen)
-        painter.drawRect(0, 0, self.width(), self.height())
-
-        # Configurações do meio círculo
-        painter.setPen(QColor(255, 255, 255))
-
-        # Desenhando a escala
-        for i in range(0, 3601, 500):  # Escala de 0 a 3600
-            angle = math.radians(180 - (180 * (i / 3600)))  # Ajuste para direção correta
-            x1 = int(center_x + radius * math.cos(angle))
-            y1 = int(center_y - radius * math.sin(angle))
-            x2 = int(center_x + (radius - 20) * math.cos(angle))
-            y2 = int(center_y - (radius - 20) * math.sin(angle))
-            painter.drawLine(x1, y1, x2, y2)
-
-        # Desenhando os números na ordem correta
-        painter.setFont(QFont("Arial", 10))
-        for i in range(0, 3601, 500):  # Mostra todos os valores (incluindo intermediários)
-            angle = math.radians(180 - (180 * (i / 3600)))  # Ajuste para direção correta
-            x = int(center_x + (radius - 40) * math.cos(angle))
-            y = int(center_y - (radius - 40) * math.sin(angle))
-
-            text = str(i)  # Números em ordem crescente
-            text_width = painter.fontMetrics().horizontalAdvance(text)
-            text_height = painter.fontMetrics().height()
+            # Desenhar escala
             painter.setPen(QColor(255, 255, 255))
-            painter.drawText(x - text_width // 2, y + text_height // 4, text)
+            for i in range(0, 3601, 500):
+                angle = math.radians(180 - (i / 3600 * 180))
+                
+                # Converter coordenadas para inteiros
+                x1 = int(center_x + (radius - 10) * math.cos(angle))
+                y1 = int(center_y - (radius - 10) * math.sin(angle))
+                x2 = int(center_x + (radius - 30) * math.cos(angle))
+                y2 = int(center_y - (radius - 30) * math.sin(angle))
+                painter.drawLine(x1, y1, x2, y2)
+                
+                # Texto dos valores
+                if i % 1000 == 0:
+                    text = str(i)
+                    text_width = painter.fontMetrics().horizontalAdvance(text)
+                    text_height = painter.fontMetrics().height()
+                    
+                    x_text = int(center_x + (radius - 50) * math.cos(angle) - text_width/2)
+                    y_text = int(center_y - (radius - 50) * math.sin(angle) + text_height/4)
+                    painter.drawText(x_text, y_text, text)
 
-        # Desenhando o ponteiro a partir do lado esquerdo
-        angle = math.radians(180 - (180 * (self._valor_atual / 3600)))  # Ajuste para direção correta
-        x1 = int(center_x + (radius - 60) * math.cos(angle))
-        y1 = int(center_y - (radius - 60) * math.sin(angle))
-        painter.setPen(QColor(255, 0, 0))
-        painter.drawLine(center_x, center_y, x1, y1)
-
-        painter.end()
+            # Desenhar ponteiro
+            angle = math.radians(180 - (self._valor_atual / 3600 * 180))
+            pointer_length = radius - 50
+            
+            painter.setPen(QColor(255, 0, 0))
+            painter.setBrush(QColor(255, 0, 0, 100))
+            
+            x_pointer = int(center_x + pointer_length * math.cos(angle))
+            y_pointer = int(center_y - pointer_length * math.sin(angle))
+            painter.drawLine(center_x, center_y, x_pointer, y_pointer)
+            
+            # Base do ponteiro
+            painter.drawEllipse(center_x - 5, center_y - 5, 10, 10)
 
     def getValorAtual(self):
         return self._valor_atual
 
     def setValorAtual(self, value):
-        if value != self._valor_atual:  # Evita loops desnecessários
+        if value != self._valor_atual:
             self._valor_atual = value
-            self.update()  # Força a atualização
+            self.update()
 
     valor_atual = pyqtProperty(float, getValorAtual, setValorAtual)
