@@ -9,7 +9,7 @@ class BarraCombustivelWidget(QWidget):
 
         self._nivel_combustivel = 100  # Nível inicial de combustível
         self.direcao = -1  # Simula a variação do nível
-        self.setFixedSize(200, 400)
+        self.setFixedSize(150, 300)  # 75% do tamanho original (200x400)
         self.setStyleSheet("background-color: transparent;")
 
         self.timer = QTimer(self)
@@ -29,7 +29,7 @@ class BarraCombustivelWidget(QWidget):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
 
-        # Dimensões da barra
+        # Dimensões da barra (ajustadas proporcionalmente)
         bar_x = self.width() // 4
         bar_width = self.width() // 2
         bar_height = self.height()
@@ -50,9 +50,9 @@ class BarraCombustivelWidget(QWidget):
         painter.drawRect(bar_x, bar_height - nivel_height, bar_width, nivel_height)
 
         # Adicionando a porcentagem ao lado
-        painter.setFont(QFont("Arial", 12, QFont.Bold))
+        painter.setFont(QFont("Arial", 10, QFont.Bold))  # Fonte um pouco menor
         percentage_text = f"{self._nivel_combustivel}%"
-        text_x = bar_x + bar_width + 10
-        text_y = bar_height - nivel_height - 10
+        text_x = bar_x + bar_width + 8  # Ajuste da posição do texto
+        text_y = bar_height - nivel_height - 8
         painter.setPen(Qt.white)
         painter.drawText(text_x, text_y, percentage_text)

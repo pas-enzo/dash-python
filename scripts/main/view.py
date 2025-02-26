@@ -1,10 +1,10 @@
 import sys
 import numpy as np
 import os
-from PyQt5.QtGui import QPixmap, QFont, QIcon, QFontDatabase
+from PyQt5.QtGui import QPixmap, QFont, QIcon, QFontDatabase, QTransform
 from PyQt5.QtWidgets import (
     QAction, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QToolBar, QApplication, QSizePolicy,
-    QToolButton, QLabel, QStackedWidget
+    QToolButton, QLabel, QStackedWidget, QFrame
 )
 from PyQt5.QtCore import Qt, QTimer
 import time
@@ -122,11 +122,54 @@ class RacingDashboard(QMainWindow):
 
     def create_car_widget(self):
         widget = QWidget()
-        layout = QVBoxLayout(widget)
-        # Removendo a label "Informações sobre pneus"
-        # tires_info_label = QLabel("Informações sobre pneus")
-        # tires_info_label.setStyleSheet("font-size: 18px; color: white;")
-        # layout.addWidget(tires_info_label)
+        layout = QVBoxLayout(widget)  # Usa QVBoxLayout para organizar os elementos
+
+        # Cria um QFrame para servir como contêiner da imagem do carro
+        container = QFrame(widget)
+        container.setStyleSheet("background-color: #303030; padding: 20px; border-radius: 20px;")  # Cor de fundo e padding
+        container_layout = QVBoxLayout(container)  # Layout interno para o contêiner
+        container_layout.setAlignment(Qt.AlignCenter)  # Centraliza o conteúdo
+
+        # Cria um QLabel para a imagem do carro
+        car_label = QLabel(container)
+        car_label.setAlignment(Qt.AlignCenter)  # Centraliza a imagem no QLabel
+        
+        # Define o caminho da imagem relativo ao diretório do script
+        script_dir = os.path.dirname(os.path.abspath(__file__))  # Obtém o diretório do script
+        car_image_path = os.path.join(script_dir, "teleeeeeeeeeeeeeemetria_porraaaaaa.png")  # Caminho relativo
+        
+        # Verifica se o arquivo da imagem do carro existe
+        if os.path.exists(car_image_path):
+            pixmap = QPixmap(car_image_path)
+
+            # Redimensiona a imagem do carro (exemplo: 50% do tamanho original)
+            scaled_pixmap = pixmap.scaled(
+                int(pixmap.width() * 1.5),  # Largura aumentada para 150%
+                int(pixmap.height() * 1.5),  # Altura aumentada para 150%
+                Qt.KeepAspectRatio,  # Mantém a proporção da imagem
+                Qt.SmoothTransformation  # Suaviza a imagem ao redimensionar
+            )
+
+            # Rotaciona a imagem do carro em 90 graus
+            transform = QTransform()
+            transform.rotate(-90)  # Rotaciona 90 graus
+            rotated_pixmap = scaled_pixmap.transformed(transform, Qt.SmoothTransformation)
+
+            # Define a imagem redimensionada e rotacionada no QLabel do carro
+            car_label.setPixmap(rotated_pixmap)
+        else:
+            logger.error(f"Erro: A imagem do carro '{car_image_path}' não foi encontrada.")
+
+        # Adiciona o car_label ao layout do contêiner
+        container_layout.addWidget(car_label)
+
+        # Adiciona o contêiner ao layout principal
+        layout.addWidget(container, alignment=Qt.AlignCenter)  # Centraliza o contêiner no layout
+
+        # Define o layout do widget
+        layout.setContentsMargins(0, 0, 0, 0)  # Remove margens para ocupar todo o espaço
+        layout.setSpacing(0)
+
         return widget
 
     def create_graphs_widget(self):
@@ -236,6 +279,18 @@ class RacingDashboard(QMainWindow):
             self.stacked_widget.setCurrentWidget(self.graphs_widget)
         elif button_name == "Mapa":
             self.stacked_widget.setCurrentWidget(self.map_widget)
+            
+    def resizeEvent(self, event):
+        # Atualiza o tamanho da imagem quando a janela é redimensionada
+        if hasattr(self, 'background_label') and self.background_label.pixmap():
+            pixmap = self.background_label.pixmap()
+            scaled_pixmap = pixmap.scaled(
+                self.background_label.size(),
+                Qt.KeepAspectRatio,
+                Qt.SmoothTransformation
+            )
+            self.background_label.setPixmap(scaled_pixmap)
+        super().resizeEvent(event)
 
 def main():
     app = QApplication(sys.argv)
