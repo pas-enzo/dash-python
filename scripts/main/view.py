@@ -18,6 +18,7 @@ from tacometro import TacometroWidget
 from acionamento import FourWheelDriveWidget
 import logging
 import configparser
+from balancebar import BrakeBalanceBar
 
 # Configuração de logging
 logging.basicConfig(level=logging.INFO)
@@ -81,6 +82,7 @@ class RacingDashboard(QMainWindow):
         label_info = QLabel("")
         tacometro = TacometroWidget()
         four_wheel_drive = FourWheelDriveWidget()  # Adiciona a widget do 4x4
+        balancebar = BrakeBalanceBar()
 
         label_info.setAlignment(Qt.AlignCenter)
         label_info.setStyleSheet("font-size: 18px; color: white;")
@@ -117,6 +119,12 @@ class RacingDashboard(QMainWindow):
         layout_four_wheel_drive.addWidget(four_wheel_drive)
         layout_four_wheel_drive.setAlignment(Qt.AlignCenter)
         quadrantes[2][2].setLayout(layout_four_wheel_drive)
+
+        # Adiciona o widget balance bar
+        layout_balancebar = QVBoxLayout()
+        layout_balancebar.addWidget(balancebar)
+        layout_balancebar.setAlignment(Qt.AlignCenter)
+        quadrantes[0][2].setLayout(layout_balancebar)
 
         return widget
 
