@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel
 from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QPainter, QColor, QLinearGradient
 
@@ -13,7 +13,7 @@ class BrakeBalanceBar(QWidget):
         self._dragging = False  # Indica se o usuário está arrastando a linha
 
         # Configurações do widget
-        self.setFixedSize(400, 40)  # Tamanho da barra (mais espessa)
+        self.setFixedSize(500, 80)  # Tamanho da barra (mais espessa)
         self.setStyleSheet("""
             background-color: transparent;
         """)
@@ -89,13 +89,53 @@ class BrakeBalanceWidget(QWidget):
         layout = QVBoxLayout()
         self.setLayout(layout)
 
+        # Título da barra de frenagem
+        self.label_titulo = QLabel("Balance Bar de Frenagem")
+        self.label_titulo.setAlignment(Qt.AlignCenter)
+        self.label_titulo.setStyleSheet("""
+            QLabel {
+                font-size: 16px;
+                font-weight: bold;
+                color: white;
+                margin-bottom: 10px;  /* Espaçamento abaixo do título */
+            }
+        """)
+        layout.addWidget(self.label_titulo)
+
+        # Texto "Balance Bar" acima da barra
+        self.label_balance_bar = QLabel("Balance Bar")
+        self.label_balance_bar.setAlignment(Qt.AlignCenter)
+        self.label_balance_bar.setStyleSheet("""
+            QLabel {
+                font-size: 14px;
+                font-weight: bold;
+                color: white;
+                margin-bottom: 5px;  /* Espaçamento abaixo do texto */
+            }
+        """)
+        layout.addWidget(self.label_balance_bar)
+
         # Barra de frenagem personalizada
         self.brake_balance_bar = BrakeBalanceBar()
         layout.addWidget(self.brake_balance_bar)
 
+        # Label "Acionamento 4x4"
+        self.label_4x4 = QLabel("Acionamento 4x4")
+        self.label_4x4.setAlignment(Qt.AlignCenter)
+        self.label_4x4.setStyleSheet("""
+            QLabel {
+                font-size: 16px;
+                font-weight: bold;
+                color: white;
+                margin-top: 20px;  /* Espaçamento acima do rótulo */
+                margin-bottom: 10px;  /* Espaçamento abaixo do rótulo */
+            }
+        """)
+        layout.addWidget(self.label_4x4)
+
         # Configurações da janela
         self.setWindowTitle('Balance Bar de Frenagem')
-        self.setGeometry(300, 300, 400, 100)
+        self.setGeometry(300, 300, 500, 300)  # Aumentei a altura para 300px
         self.setStyleSheet("""
             QWidget {
                 background-color: #2B2B2B;

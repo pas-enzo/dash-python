@@ -19,6 +19,17 @@ from acionamento import FourWheelDriveWidget
 import logging
 import configparser
 from balancebar import BrakeBalanceBar
+from tmotor import TemperatureMotorWidget
+from bateria import BatteryWidget
+from distancia import DistanceWidget
+
+import logging
+
+# Configuração de logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+logger.info("Iniciando a aplicação...")
 
 # Configuração de logging
 logging.basicConfig(level=logging.INFO)
@@ -31,6 +42,7 @@ config.read('config.ini')
 class RacingDashboard(QMainWindow):
     def __init__(self):
         super().__init__()
+        logger.info("Inicializando RacingDashboard...")
         self.setWindowTitle("PacDash 3")
         self.setGeometry(100, 100, 1800, 1000)
 
@@ -57,77 +69,78 @@ class RacingDashboard(QMainWindow):
         # Inicializa a interface
         self.initUI()
 
+    from PyQt5.QtWidgets import QWidget, QGridLayout
+
     def create_general_widget(self):
-        widget = QWidget()
-        layout = QGridLayout(widget)
-        layout.setSpacing(5)
+     widget = QWidget()
+     layout = QGridLayout(widget)
+     layout.setSpacing(10)  # Espaçamento entre os widgets
+     layout.setContentsMargins(10, 10, 10, 10)  # Margens ao redor do layout
 
-        # Criar os quadrantes (widgets vazios)
-        quadrantes = [[QWidget() for _ in range(3)] for _ in range(3)]
+     # Definindo uma grade mais organizada (exemplo: 10 linhas x 20 colunas)
 
-        for i in range(3):
-            for j in range(3):
-                quadrantes[i][j].setObjectName(f"quadrante_{i}_{j}")
-                layout.addWidget(quadrantes[i][j], i, j)
+     # Tacômetro (esquerda, tamanho maior)
+     tacometro = TacometroWidget()
+     layout.addWidget(tacometro, 8, 0, 8, 8)  # Linha 2-7, Coluna 0-7
 
-        # Garantir que todos os quadrantes tenham o mesmo tamanho
-        for i in range(3):
-            layout.setRowStretch(i, 1)
-            layout.setColumnStretch(i, 1)
+     # Velocímetro (direita, tamanho maior)
+     velocimetro = VelocimetroWidget()
+     layout.addWidget(velocimetro, 3, 8, 6, 8)  # Linha 2-7, Coluna 8-15
 
-        # Criar widgets e adicioná-los nos quadrantes corretos
-        velocimetro = VelocimetroWidget()
-        barra_combustivel = BarraCombustivelWidget()
-        botaobox = CallCarWidget()
-        label_info = QLabel("")
-        tacometro = TacometroWidget()
-        four_wheel_drive = FourWheelDriveWidget()  # Adiciona a widget do 4x4
-        balancebar = BrakeBalanceBar()
+     # Balance Bar (acima dos medidores, centralizado)
+     balancebar = BrakeBalanceBar()
+     layout.addWidget(balancebar, 6, 7, 1, 8)  # Linha 0, Coluna 4-11
 
-        label_info.setAlignment(Qt.AlignCenter)
-        label_info.setStyleSheet("font-size: 18px; color: white;")
+     # Combustível (acima do tacômetro)
+     barra_combustivel = BarraCombustivelWidget()
+     layout.addWidget(barra_combustivel, 2, 0, 1, 3)  # Linha 1, Coluna 0-3
 
-        # Criar layouts internos para centralizar os widgets
-        layout_velocimetro = QVBoxLayout()
-        layout_velocimetro.addWidget(velocimetro)
-        layout_velocimetro.setAlignment(Qt.AlignCenter)
-        quadrantes[0][1].setLayout(layout_velocimetro)
+     # Temperatura do motor (acima do velocímetro)
+     Temperaturamotor = TemperatureMotorWidget ()
+     layout.addWidget(Temperaturamotor, 4, 15, 3, 4)  # Linha 1, Coluna 8-15
 
-        layout_combustivel = QVBoxLayout()
-        layout_combustivel.addWidget(barra_combustivel)
-        layout_combustivel.setAlignment(Qt.AlignCenter)
-        quadrantes[2][1].setLayout(layout_combustivel)
+     # 4x4 (canto inferior esquerdo)
+     four_wheel_drive = FourWheelDriveWidget()
+     layout.addWidget(four_wheel_drive, 2, 4, 2, 4)  # Linha 8-9, Coluna 0-3
 
-        layout_botaobox = QVBoxLayout()
-        layout_botaobox.addWidget(botaobox)
-        layout_botaobox.setAlignment(Qt.AlignCenter)
-        quadrantes[1][2].setLayout(layout_botaobox)
+     # Botão de chamada do carro (canto inferior direito)
+     botaobox = CallCarWidget()
+     layout.addWidget(botaobox, 1, 16, 2, 6)  # Linha 8-9, Coluna 16-19
 
-        layout_info = QVBoxLayout()
-        layout_info.addWidget(label_info)
-        layout_info.setAlignment(Qt.AlignCenter)
-        quadrantes[1][1].setLayout(layout_info)
+    # Bateria (abaixo do velocímetro)
+     bateria = BatteryWidget()
+     layout.addWidget(bateria, 4, 2, 3, 5)  # Linha 8-9, Coluna 16-19
 
-        # Adicionar o tacômetro no canto superior esquerdo (quadrante [0][0])
-        layout_tacometro = QVBoxLayout()
-        layout_tacometro.addWidget(tacometro)
-        layout_tacometro.setAlignment(Qt.AlignCenter)
-        quadrantes[0][0].setLayout(layout_tacometro)
+     # Distância (abaixo do tacômetro)
+     distancia = DistanceWidget()
+     layout.addWidget(distancia, 2, 10, 2, 3)  # Linha 8-9, Coluna 16-19
 
-        # Adicionar a widget do 4x4 no canto superior direito (quadrante [2][2])
-        layout_four_wheel_drive = QVBoxLayout()
-        layout_four_wheel_drive.addWidget(four_wheel_drive)
-        layout_four_wheel_drive.setAlignment(Qt.AlignCenter)
-        quadrantes[2][2].setLayout(layout_four_wheel_drive)
+     # Ajustando o espaçamento e alinhamento
+     for row in range(10):  # 10 linhas no total
+        layout.setRowStretch(row, 1)
+     for col in range(20):  # 20 colunas no total
+        layout.setColumnStretch(col, 1)
 
-        # Adiciona o widget balance bar
-        layout_balancebar = QVBoxLayout()
-        layout_balancebar.addWidget(balancebar)
-        layout_balancebar.setAlignment(Qt.AlignCenter)
-        quadrantes[0][2].setLayout(layout_balancebar)
+     # Ajustes específicos para proporções
+     layout.setRowStretch(0, 1)    # Topo (balance bar)
+     layout.setRowStretch(1, 1)    # Combustível e temperatura
+     layout.setRowStretch(2, 2)    # Início dos medidores
+     layout.setRowStretch(3, 2)
+     layout.setRowStretch(4, 2)
+     layout.setRowStretch(5, 2)
+     layout.setRowStretch(6, 2)
+     layout.setRowStretch(7, 2)    # Fim dos medidores
+     layout.setRowStretch(8, 1)    # Botões
+     layout.setRowStretch(9, 1)
 
-        return widget
+     layout.setColumnStretch(0, 2)   # Início tacômetro
+     layout.setColumnStretch(7, 2)   # Fim tacômetro
+     layout.setColumnStretch(8, 2)   # Início velocímetro
+     layout.setColumnStretch(15, 2)  # Fim velocímetro
+     layout.setColumnStretch(16, 1)  # Início botão
+     layout.setColumnStretch(19, 1)  # Fim botão
 
+     return widget
     def create_car_widget(self):
         widget = QWidget()
         layout = QVBoxLayout(widget)  # Usa QVBoxLayout para organizar os elementos
@@ -301,10 +314,10 @@ class RacingDashboard(QMainWindow):
         super().resizeEvent(event)
 
 def main():
-    app = QApplication(sys.argv)
-    window = RacingDashboard()
-    window.show()
-    sys.exit(app.exec_())
+    app = QApplication(sys.argv)  # Cria a aplicação
+    window = RacingDashboard()    # Cria a janela principal
+    window.show()                 # Exibe a janela
+    sys.exit(app.exec_())         # Inicia o loop de eventos da aplicação
 
 if __name__ == "__main__":
-    main()
+    main()  # Chama a função main para iniciar a aplicação

@@ -10,7 +10,7 @@ class TacometroWidget(QWidget):
         self.direcao = 1
 
         # Configurações de tamanho
-        self.setMinimumSize(200, 200)
+        self.setMinimumSize(1000, 800)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # Layout principal
