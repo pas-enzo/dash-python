@@ -97,15 +97,15 @@ class RacingDashboard(QMainWindow):
 
      # Temperatura do motor (acima do velocímetro)
      Temperaturamotor = TemperatureMotorWidget ()
-     layout.addWidget(Temperaturamotor, 4, 15, 3, 4)  # Linha 1, Coluna 8-15
+     layout.addWidget(Temperaturamotor, 1, 11, 3, 4)  # Linha 1, Coluna 8-15
 
      # 4x4 (canto inferior esquerdo)
      four_wheel_drive = FourWheelDriveWidget()
-     layout.addWidget(four_wheel_drive, 2, 4, 2, 4)  # Linha 8-9, Coluna 0-3
+     layout.addWidget(four_wheel_drive, 2, 2, 2, 4)  # Linha 8-9, Coluna 0-3
 
      # Botão de chamada do carro (canto inferior direito)
      botaobox = CallCarWidget()
-     layout.addWidget(botaobox, 1, 16, 2, 6)  # Linha 8-9, Coluna 16-19
+     layout.addWidget(botaobox, 4, 12, 3, 6)  # Linha 8-9, Coluna 16-19
 
     # Bateria (abaixo do velocímetro)
      bateria = BatteryWidget()
@@ -113,7 +113,7 @@ class RacingDashboard(QMainWindow):
 
      # Distância (abaixo do tacômetro)
      distancia = DistanceWidget()
-     layout.addWidget(distancia, 2, 10, 2, 3)  # Linha 8-9, Coluna 16-19
+     layout.addWidget(distancia, 2, 7, 2, 3)  # Linha 8-9, Coluna 16-19
 
      # Ajustando o espaçamento e alinhamento
      for row in range(10):  # 10 linhas no total
